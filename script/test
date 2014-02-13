@@ -1,0 +1,6 @@
+script/fmt
+
+packages="./server"
+
+go test -race -i $packages
+go test -race -v $packages
