@@ -1,4 +1,4 @@
-package main
+package deploy_docus
 
 import ()
 

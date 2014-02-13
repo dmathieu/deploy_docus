@@ -1,4 +1,4 @@
-package server
+package deploy_docus
 
 import (
 	"fmt"

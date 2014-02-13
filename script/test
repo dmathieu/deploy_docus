@@ -1,6 +1,5 @@
-script/fmt
+script/build
+go fmt ./...
 
-packages="./server"
-
-go test -race -i $packages
-go test -race -v $packages
+go test -race -i ./...
+go test -race -v ./...
