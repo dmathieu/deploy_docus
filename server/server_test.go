@@ -21,7 +21,7 @@ func TestSuccessfulGetHome(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	server.Martini.ServeHTTP(response, request)
+	server.ServeHTTP(response, request)
 
 	assert.Equal(t, http.StatusOK, response.Code)
 	assert.Equal(t, `You might be "a doctor". I am "the doctor".`, fmt.Sprintf("%s", response.Body))
@@ -61,7 +61,7 @@ func TestSuccessfulDeploy(t *testing.T) {
 	}
 
 	go retrieveMessage(channel)
-	server.Martini.ServeHTTP(response, request)
+	server.ServeHTTP(response, request)
 
 	assert.Equal(t, http.StatusCreated, response.Code)
 }
