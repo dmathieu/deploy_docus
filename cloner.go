@@ -9,16 +9,12 @@ type Cloner struct {
 	*Repository
 }
 
-func (c *Cloner) Path() string {
-	return "/tmp/deploy_docus"
-}
-
 func (c *Cloner) Command() []string {
-	return []string{"clone", c.Origin, c.Path()}
+	return []string{"clone", c.Origin, c.LocalPath()}
 }
 
 func (c *Cloner) Fetch() error {
-	err := os.RemoveAll(c.Path())
+	err := os.RemoveAll(c.LocalPath())
 	_, err = exec.Command("git", c.Command()...).Output()
 
 	if err != nil {

@@ -2,6 +2,7 @@ package deploy_docus
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 )
 
@@ -18,6 +19,7 @@ func (c *Pusher) Command() []string {
 }
 
 func (c *Pusher) Fetch() error {
+	os.Chdir(c.Repository.LocalPath())
 	_, err := exec.Command("git", c.Command()...).Output()
 
 	if err != nil {
