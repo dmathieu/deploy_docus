@@ -22,6 +22,8 @@ func (c *Server) mapRoutes() {
 	})
 
 	c.Post("/deploy", binding.Form(Message{}), func(message Message, channel *chan Message, req *http.Request) (int, string) {
+		message.Repository = FindRepository()
+
 		*channel <- message
 
 		return 201, ""

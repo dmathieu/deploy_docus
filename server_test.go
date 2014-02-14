@@ -58,6 +58,7 @@ func TestSuccessfulDeploy(t *testing.T) {
 		message := <-channel
 		assert.Equal(t, 1, message.Id)
 		assert.Equal(t, "a84d88e7554fc1fa21bcbc4efae3c782a70d2b9d", message.Sha)
+		assert.NotEqual(t, nil, message.Repository)
 	}
 
 	go retrieveMessage(channel)

@@ -1,30 +1,29 @@
 package deploy_docus
 
 import (
-	"fmt"
-	"net/url"
 	"os"
 	"os/exec"
 )
 
 type Cloner struct {
-	Url  *url.URL
-	Path string
+	*Repository
+}
+
+func (c *Cloner) Path() string {
+	return "/tmp/deploy_docus"
 }
 
 func (c *Cloner) Fetch() error {
-	err := os.RemoveAll(c.Path)
-	b, err := exec.Command("git", "clone", c.Url.String(), c.Path).Output()
+	err := os.RemoveAll(c.Path())
+	_, err = exec.Command("git", "clone", c.Origin, c.Path()).Output()
 
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(string(b))
-
 	return nil
 }
 
-func NewCloner(url *url.URL, path string) *Cloner {
-	return &Cloner{Url: url, Path: path}
+func NewCloner(repository *Repository) *Cloner {
+	return &Cloner{repository}
 }

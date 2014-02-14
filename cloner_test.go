@@ -2,13 +2,12 @@ package deploy_docus
 
 import (
 	"github.com/bmizerany/assert"
-	"net/url"
 	"testing"
 )
 
 func TestSuccessfulFetch(t *testing.T) {
-	url, _ := url.Parse("https://github.com/lyonrb/deploy_docus.git")
-	cloner := NewCloner(url, "/tmp/deploy_docus")
+	repository := &Repository{Origin: "https://github.com/lyonrb/deploy_docus.git"}
+	cloner := NewCloner(repository)
 
 	err := cloner.Fetch()
 
