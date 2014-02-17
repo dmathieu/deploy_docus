@@ -5,11 +5,12 @@ import (
 	"testing"
 )
 
-func TestSuccessfulFetch(t *testing.T) {
-	repository := &Repository{Origin: "https://github.com/lyonrb/deploy_docus.git"}
+func TestSuccessfulCloneBuildCmd(t *testing.T) {
+	repository := &Repository{Origin: "git@github.com:lyonrb/deploy_docus.git"}
 	cloner := NewCloner(repository)
 
-	err := cloner.Fetch()
+	command := cloner.BuildCmd()
 
-	assert.Equal(t, nil, err)
+	assert.Equal(t, "/usr/bin/git", command.Path)
+	assert.Equal(t, []string{"git", "clone", "git@github.com:lyonrb/deploy_docus.git", "/tmp/lyonrb_deploy_docus"}, command.Args)
 }
