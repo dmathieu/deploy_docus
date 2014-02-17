@@ -13,10 +13,6 @@ func (p *Pusher) Ref() string {
 	return fmt.Sprintf("%s:master", p.Sha)
 }
 
-func (p *Pusher) Command() []string {
-	return []string{"git", "push", p.Repository.Destination, p.Ref(), "-f"}
-}
-
 func (p *Pusher) BuildCmd() *exec.Cmd {
 	path, err := exec.LookPath("git")
 	if err != nil {
@@ -26,7 +22,8 @@ func (p *Pusher) BuildCmd() *exec.Cmd {
 	return &exec.Cmd{
 		Path: path,
 		Dir:  p.Repository.LocalPath(),
-		Args: p.Command(),
+		Args: []string{"git", "push", p.Repository.Destination, p.Ref(), "-f"},
+		Env:  []string{"GIT_SSH=script/ssh", fmt.Sprintf("PKEY=%s", p.Repository.PKeyPath())},
 	}
 }
 

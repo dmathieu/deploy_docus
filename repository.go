@@ -23,6 +23,10 @@ func (r *Repository) LocalPath() string {
 	return fmt.Sprintf("/tmp/%s", r.Name())
 }
 
+func (r *Repository) PKeyPath() string {
+	return fmt.Sprintf("/tmp/deploy_docus/keys/%s", r.Name())
+}
+
 func FindRepository() *Repository {
 	return &Repository{
 		Origin:      os.Getenv("REPOSITORY_ORIGIN"),
