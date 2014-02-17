@@ -7,6 +7,17 @@ import (
 	"testing"
 )
 
+var pemPrivateKey = `-----BEGIN RSA PRIVATE KEY-----
+MIIBOgIBAAJBALKZD0nEffqM1ACuak0bijtqE2QrI/KLADv7l3kK3ppMyCuLKoF0
+fd7Ai2KW5ToIwzFofvJcS/STa6HA5gQenRUCAwEAAQJBAIq9amn00aS0h/CrjXqu
+/ThglAXJmZhOMPVn4eiu7/ROixi9sex436MaVeMqSNf7Ex9a8fRNfWss7Sqd9eWu
+RTUCIQDasvGASLqmjeffBNLTXV2A5g4t+kLVCpsEIZAycV5GswIhANEPLmax0ME/
+EO+ZJ79TJKN5yiGBRsv5yvx5UiHxajEXAiAhAol5N4EUyq6I9w1rYdhPMGpLfk7A
+IU2snfRJ6Nq2CQIgFrPsWRCkV+gOYcajD17rEqmuLrdIRexpg8N1DOSXoJ8CIGlS
+tAboUGBxTDq3ZroNism3DaMIbKPyYrAqhKov1h5V
+-----END RSA PRIVATE KEY-----
+`
+
 func TestName(t *testing.T) {
 	repository := &Repository{Origin: "git@github.com:dmathieu/deploy_docus.git"}
 	assert.Equal(t, "dmathieu_deploy_docus", repository.Name())
@@ -45,6 +56,25 @@ func TestPKeyPath(t *testing.T) {
 
 	repository.Origin = "git@github.com:github/hubot.git"
 	assert.Equal(t, "/tmp/deploy_docus/keys/github_hubot", repository.PKeyPath())
+}
+
+func TestSuccessfulEncryptToken(t *testing.T) {
+	repository := &Repository{PKey: pemPrivateKey, Origin: "git@github.com:dmathieu/deploy_docus.git"}
+
+	token, err := repository.Token()
+
+	assert.Equal(t, nil, err)
+	assert.NotEqual(t, nil, token)
+}
+
+func TestSuccessfulDecryptToken(t *testing.T) {
+	repository := &Repository{PKey: pemPrivateKey, Origin: "git@github.com:dmathieu/deploy_docus.git"}
+	token, _ := repository.Token()
+
+	value, err := repository.DecryptToken(token)
+
+	assert.Equal(t, nil, err)
+	assert.Equal(t, repository.Name(), string(value))
 }
 
 func TestSuccessfulFindRepository(t *testing.T) {

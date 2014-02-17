@@ -1,6 +1,11 @@
 package deploy_docus
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/sha1"
+	"crypto/x509"
+	"encoding/pem"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -42,6 +47,47 @@ func (r *Repository) CreatePKey() {
 
 func (r *Repository) PKeyPath() string {
 	return fmt.Sprintf("/tmp/deploy_docus/keys/%s", r.Name())
+}
+
+func (r *Repository) PrivateKey() (*rsa.PrivateKey, error) {
+	block, _ := pem.Decode([]byte(r.PKey))
+	return x509.ParsePKCS1PrivateKey(block.Bytes)
+}
+
+func (r *Repository) Token() ([]byte, error) {
+	var err error
+
+	key, err := r.PrivateKey()
+	if err != nil {
+		return nil, err
+	}
+
+	message := []byte(r.Name())
+	var out []byte
+	out, err = rsa.EncryptOAEP(sha1.New(), rand.Reader, &key.PublicKey, message, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return out, nil
+}
+
+func (r *Repository) DecryptToken(token []byte) ([]byte, error) {
+	var err error
+
+	key, err := r.PrivateKey()
+	if err != nil {
+		return nil, err
+	}
+
+	message := token
+	var out []byte
+	out, err = rsa.DecryptOAEP(sha1.New(), rand.Reader, key, message, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return out, nil
 }
 
 func FindRepository() *Repository {
