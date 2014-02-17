@@ -7,3 +7,8 @@ go:
 install:
   - script/build
 script: script/test
+
+matrix:
+  allow_failures:
+    - go: release
+    - go: tip
