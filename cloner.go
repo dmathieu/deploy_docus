@@ -10,12 +10,26 @@ type Cloner struct {
 }
 
 func (c *Cloner) Command() []string {
-	return []string{"clone", c.Origin, c.LocalPath()}
+	return []string{"git", "clone", c.Origin, c.LocalPath()}
+}
+
+func (c *Cloner) BuildCmd() *exec.Cmd {
+	path, err := exec.LookPath("git")
+	if err != nil {
+		path = "git"
+	}
+
+	return &exec.Cmd{
+		Path: path,
+		Args: c.Command(),
+	}
 }
 
 func (c *Cloner) Fetch() error {
 	err := os.RemoveAll(c.LocalPath())
-	_, err = exec.Command("git", c.Command()...).Output()
+
+	command := c.BuildCmd()
+	_, err = command.Output()
 
 	if err != nil {
 		return err

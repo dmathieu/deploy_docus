@@ -2,7 +2,6 @@ package deploy_docus
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 )
 
@@ -10,17 +9,30 @@ type Pusher struct {
 	*Message
 }
 
-func (c *Pusher) Ref() string {
-	return fmt.Sprintf("%s:master", c.Sha)
+func (p *Pusher) Ref() string {
+	return fmt.Sprintf("%s:master", p.Sha)
 }
 
-func (c *Pusher) Command() []string {
-	return []string{"push", c.Repository.Destination, c.Ref(), "-f"}
+func (p *Pusher) Command() []string {
+	return []string{"git", "push", p.Repository.Destination, p.Ref(), "-f"}
 }
 
-func (c *Pusher) Fetch() error {
-	os.Chdir(c.Repository.LocalPath())
-	_, err := exec.Command("git", c.Command()...).Output()
+func (p *Pusher) BuildCmd() *exec.Cmd {
+	path, err := exec.LookPath("git")
+	if err != nil {
+		path = "git"
+	}
+
+	return &exec.Cmd{
+		Path: path,
+		Dir:  p.Repository.LocalPath(),
+		Args: p.Command(),
+	}
+}
+
+func (p *Pusher) Fetch() error {
+	command := p.BuildCmd()
+	_, err := command.Output()
 
 	if err != nil {
 		return err
