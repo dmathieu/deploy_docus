@@ -27,7 +27,7 @@ func (p *Pusher) BuildCmd() *exec.Cmd {
 	}
 }
 
-func (p *Pusher) Fetch() error {
+func (p *Pusher) Push() error {
 	command := p.BuildCmd()
 	_, err := command.Output()
 

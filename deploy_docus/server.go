@@ -8,7 +8,7 @@ import (
 )
 
 type Server struct {
-	Port    int
+	Port    int64
 	Deploys chan Message
 
 	*martini.ClassicMartini
@@ -34,7 +34,7 @@ func (c *Server) Start() {
 	http.ListenAndServe(fmt.Sprintf(":%d", c.Port), c)
 }
 
-func NewServer(port int, channel chan Message) *Server {
+func NewServer(port int64, channel chan Message) *Server {
 	martini := martini.Classic()
 	server := &Server{port, channel, martini}
 	server.mapRoutes()
