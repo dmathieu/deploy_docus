@@ -11,4 +11,14 @@ IU2snfRJ6Nq2CQIgFrPsWRCkV+gOYcajD17rEqmuLrdIRexpg8N1DOSXoJ8CIGlS
 tAboUGBxTDq3ZroNism3DaMIbKPyYrAqhKov1h5V
 -----END RSA PRIVATE KEY-----
 `
+
+	repositoryOrigin      = "git@github.com:lyonrb/deploy_docus.git"
+	repositoryDestination = "git@heroku.com:deploy_docus.git"
 )
+
+func BuildTestRepository() *Repository {
+	repository := &Repository{Origin: repositoryOrigin, Destination: repositoryDestination, PKey: pemPrivateKey}
+	repository.Rsa = NewRsa(repository)
+
+	return repository
+}

@@ -6,8 +6,7 @@ import (
 )
 
 func TestSuccessfulCloneBuildCmd(t *testing.T) {
-	repository := &Repository{Origin: "git@github.com:lyonrb/deploy_docus.git", PKey: pemPrivateKey}
-	repository.Rsa = NewRsa(repository)
+	repository := BuildTestRepository()
 	cloner := NewCloner(repository)
 
 	command := cloner.BuildCmd()

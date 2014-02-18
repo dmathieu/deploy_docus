@@ -7,16 +7,16 @@ import (
 )
 
 func TestName(t *testing.T) {
-	repository := &Repository{Origin: "git@github.com:dmathieu/deploy_docus.git", PKey: pemPrivateKey}
-	assert.Equal(t, "dmathieu_deploy_docus", repository.Name())
+	repository := BuildTestRepository()
+	assert.Equal(t, "lyonrb_deploy_docus", repository.Name())
 
 	repository.Origin = "git@github.com:github/hubot.git"
 	assert.Equal(t, "github_hubot", repository.Name())
 }
 
 func TestLocalPath(t *testing.T) {
-	repository := &Repository{Origin: "git@github.com:dmathieu/deploy_docus.git", PKey: pemPrivateKey}
-	assert.Equal(t, "/tmp/dmathieu_deploy_docus", repository.LocalPath())
+	repository := BuildTestRepository()
+	assert.Equal(t, "/tmp/lyonrb_deploy_docus", repository.LocalPath())
 
 	repository.Origin = "git@github.com:github/hubot.git"
 	assert.Equal(t, "/tmp/github_hubot", repository.LocalPath())

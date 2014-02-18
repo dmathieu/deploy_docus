@@ -40,7 +40,7 @@ func TestCreateKeyFile(t *testing.T) {
 	os.RemoveAll("/tmp/deploy_docus/keys")
 
 	repository := &Repository{Origin: "git@github.com:dmathieu/deploy_docus.git", PKey: pemPrivateKey}
-	rsa := NewRsa(repository)
+	rsa := &Rsa{Repository: repository, Key: []byte(pemPrivateKey)}
 
 	_, err := os.Stat(rsa.KeyPath())
 	assert.Equal(t, true, os.IsNotExist(err))
@@ -55,9 +55,10 @@ func TestCreateKeyFile(t *testing.T) {
 }
 
 func TestKeyPath(t *testing.T) {
-	repository := &Repository{Origin: "git@github.com:dmathieu/deploy_docus.git"}
-	rsa := &Rsa{Repository: repository}
-	assert.Equal(t, "/tmp/deploy_docus/keys/dmathieu_deploy_docus", rsa.KeyPath())
+	repository := BuildTestRepository()
+	rsa := repository.Rsa
+
+	assert.Equal(t, "/tmp/deploy_docus/keys/lyonrb_deploy_docus", rsa.KeyPath())
 
 	rsa.Repository.Origin = "git@github.com:github/hubot.git"
 	assert.Equal(t, "/tmp/deploy_docus/keys/github_hubot", rsa.KeyPath())
