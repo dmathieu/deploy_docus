@@ -27,12 +27,14 @@ func deploy(message deploy_docus.Message) {
 
 	err := deploy_docus.NewCloner(message.Repository).Fetch()
 	if err != nil {
-		panic(err)
+		fmt.Println("Couldn't clone the repository:", err)
+		return
 	}
 
 	err = deploy_docus.NewPusher(&message).Push()
 	if err != nil {
-		panic(err)
+		fmt.Println("Couldn't push the repository:", err)
+		return
 	}
 }
 
