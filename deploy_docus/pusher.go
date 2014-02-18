@@ -23,7 +23,7 @@ func (p *Pusher) BuildCmd() *exec.Cmd {
 		Path: path,
 		Dir:  p.Repository.LocalPath(),
 		Args: []string{"git", "push", p.Repository.Destination, p.Ref(), "-f"},
-		Env:  []string{"GIT_SSH=script/ssh", fmt.Sprintf("PKEY=%s", p.Repository.PKeyPath())},
+		Env:  []string{"GIT_SSH=script/ssh", fmt.Sprintf("PKEY=%s", p.Repository.Rsa.KeyPath())},
 	}
 }
 

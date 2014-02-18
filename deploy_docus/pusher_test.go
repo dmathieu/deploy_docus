@@ -6,7 +6,8 @@ import (
 )
 
 func TestSuccessfulPushBuildCmd(t *testing.T) {
-	repository := &Repository{Origin: "git@github.com:lyonrb/deploy_docus.git", Destination: "git@heroku.com:deploy_docus.git"}
+	repository := &Repository{Origin: "git@github.com:lyonrb/deploy_docus.git", Destination: "git@heroku.com:deploy_docus.git", PKey: pemPrivateKey}
+	repository.Rsa = NewRsa(repository)
 	message := &Message{Repository: repository, Sha: "fabfab"}
 	pusher := NewPusher(message)
 

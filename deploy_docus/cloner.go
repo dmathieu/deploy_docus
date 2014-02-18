@@ -19,7 +19,7 @@ func (c *Cloner) BuildCmd() *exec.Cmd {
 	return &exec.Cmd{
 		Path: path,
 		Args: []string{"git", "clone", c.Origin, c.LocalPath()},
-		Env:  []string{"GIT_SSH=script/ssh", fmt.Sprintf("PKEY=%s", c.Repository.PKeyPath())},
+		Env:  []string{"GIT_SSH=script/ssh", fmt.Sprintf("PKEY=%s", c.Repository.Rsa.KeyPath())},
 	}
 }
 
