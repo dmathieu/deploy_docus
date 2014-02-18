@@ -32,7 +32,7 @@ func TestSuccessfulFindRepository(t *testing.T) {
 
 	assert.Equal(t, "git@github.com:dmathieu/deploy_docus.git", repository.Origin)
 	assert.Equal(t, "git@heroku.com:deploy_docus.git", repository.Destination)
-	assert.Equal(t, pemPrivateKey, repository.PKey)
+	assert.Equal(t, pemPrivateKey, repository.Rsa.Key)
 
 	assert.NotEqual(t, nil, repository.Rsa)
 	assert.Equal(t, repository, repository.Rsa.Repository)

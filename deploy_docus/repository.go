@@ -9,7 +9,6 @@ import (
 type Repository struct {
 	Origin      string
 	Destination string
-	PKey        []byte
 
 	Rsa *Rsa
 }
@@ -27,12 +26,12 @@ func (r *Repository) LocalPath() string {
 }
 
 func FindRepository() *Repository {
+	key := []byte(os.Getenv("REPOSITORY_PKEY"))
 	repository := &Repository{
 		Origin:      os.Getenv("REPOSITORY_ORIGIN"),
 		Destination: os.Getenv("REPOSITORY_DESTINATION"),
-		PKey:        []byte(os.Getenv("REPOSITORY_PKEY")),
 	}
-	repository.Rsa = NewRsa(repository)
+	repository.Rsa = NewRsa(repository, key)
 
 	return repository
 }

@@ -17,8 +17,8 @@ tAboUGBxTDq3ZroNism3DaMIbKPyYrAqhKov1h5V
 )
 
 func BuildTestRepository() *Repository {
-	repository := &Repository{Origin: repositoryOrigin, Destination: repositoryDestination, PKey: pemPrivateKey}
-	repository.Rsa = NewRsa(repository)
+	repository := &Repository{Origin: repositoryOrigin, Destination: repositoryDestination}
+	repository.Rsa = NewRsa(repository, pemPrivateKey)
 
 	return repository
 }

@@ -65,8 +65,8 @@ func BuildPrivateKey(content []byte) (*rsa.PrivateKey, error) {
 	return x509.ParsePKCS1PrivateKey(block.Bytes)
 }
 
-func NewRsa(repository *Repository) *Rsa {
-	rsa := &Rsa{Repository: repository, Key: []byte(repository.PKey)}
+func NewRsa(repository *Repository, ssh_key []byte) *Rsa {
+	rsa := &Rsa{Repository: repository, Key: ssh_key}
 
 	key, err := BuildPrivateKey(rsa.Key)
 	if err != nil {

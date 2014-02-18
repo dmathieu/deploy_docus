@@ -29,8 +29,8 @@ func TestSuccessfulDecrypt(t *testing.T) {
 }
 
 func TestNewRsa(t *testing.T) {
-	repository := &Repository{Origin: "git@github.com:dmathieu/deploy_docus.git", PKey: pemPrivateKey}
-	rsa := NewRsa(repository)
+	repository := &Repository{Origin: "git@github.com:dmathieu/deploy_docus.git"}
+	rsa := NewRsa(repository, pemPrivateKey)
 
 	assert.Equal(t, repository, rsa.Repository)
 	assert.NotEqual(t, nil, rsa.Private)
@@ -39,7 +39,7 @@ func TestNewRsa(t *testing.T) {
 func TestCreateKeyFile(t *testing.T) {
 	os.RemoveAll("/tmp/deploy_docus/keys")
 
-	repository := &Repository{Origin: "git@github.com:dmathieu/deploy_docus.git", PKey: pemPrivateKey}
+	repository := &Repository{Origin: "git@github.com:dmathieu/deploy_docus.git"}
 	rsa := &Rsa{Repository: repository, Key: pemPrivateKey}
 
 	_, err := os.Stat(rsa.KeyPath())
