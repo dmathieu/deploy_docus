@@ -25,7 +25,7 @@ func TestLocalPath(t *testing.T) {
 func TestSuccessfulFindRepository(t *testing.T) {
 	os.Setenv("REPOSITORY_ORIGIN", "git@github.com:dmathieu/deploy_docus.git")
 	os.Setenv("REPOSITORY_DESTINATION", "git@heroku.com:deploy_docus.git")
-	os.Setenv("REPOSITORY_PKEY", pemPrivateKey)
+	os.Setenv("REPOSITORY_PKEY", string(pemPrivateKey))
 
 	var repository *Repository
 	repository = FindRepository()

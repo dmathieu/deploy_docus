@@ -8,7 +8,7 @@ import (
 )
 
 func TestSuccessfulEncrypt(t *testing.T) {
-	key, _ := BuildPrivateKey([]byte(pemPrivateKey))
+	key, _ := BuildPrivateKey(pemPrivateKey)
 	rsa := &Rsa{Private: key}
 
 	encrypted, err := rsa.Encrypt([]byte("hello"))
@@ -18,7 +18,7 @@ func TestSuccessfulEncrypt(t *testing.T) {
 }
 
 func TestSuccessfulDecrypt(t *testing.T) {
-	key, _ := BuildPrivateKey([]byte(pemPrivateKey))
+	key, _ := BuildPrivateKey(pemPrivateKey)
 	rsa := &Rsa{Private: key}
 
 	encrypted, err := rsa.Encrypt([]byte("hello world"))
@@ -40,7 +40,7 @@ func TestCreateKeyFile(t *testing.T) {
 	os.RemoveAll("/tmp/deploy_docus/keys")
 
 	repository := &Repository{Origin: "git@github.com:dmathieu/deploy_docus.git", PKey: pemPrivateKey}
-	rsa := &Rsa{Repository: repository, Key: []byte(pemPrivateKey)}
+	rsa := &Rsa{Repository: repository, Key: pemPrivateKey}
 
 	_, err := os.Stat(rsa.KeyPath())
 	assert.Equal(t, true, os.IsNotExist(err))
@@ -51,7 +51,7 @@ func TestCreateKeyFile(t *testing.T) {
 	assert.Equal(t, false, os.IsNotExist(err))
 
 	content, err := ioutil.ReadFile(rsa.KeyPath())
-	assert.Equal(t, pemPrivateKey, string(content))
+	assert.Equal(t, pemPrivateKey, content)
 }
 
 func TestKeyPath(t *testing.T) {
