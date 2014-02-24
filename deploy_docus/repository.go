@@ -37,6 +37,7 @@ func BuildRepository(id int64, origin string, destination string, rsa_key []byte
 
 func CreateRepository(origin string, destination string, rsa_key []byte) (*Repository, error) {
 	db, err := GetDbConnection()
+	defer db.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -52,6 +53,7 @@ func CreateRepository(origin string, destination string, rsa_key []byte) (*Repos
 
 func FindRepository(id int64) (*Repository, error) {
 	db, err := GetDbConnection()
+	defer db.Close()
 	if err != nil {
 		return nil, err
 	}
