@@ -36,14 +36,12 @@ func BuildRepository(id int64, origin string, destination string, rsa_key []byte
 }
 
 func CreateRepository(origin string, destination string, rsa_key []byte) (*Repository, error) {
-	db, err := GetDbConnection()
-	defer db.Close()
+	var id int64
+	row, err := QueryRow(`INSERT INTO repositories (origin, destination, rsa_key) VALUES ($1, $2, $3) RETURNING id;`, origin, destination, rsa_key)
 	if err != nil {
 		return nil, err
 	}
-
-	var id int64
-	err = db.QueryRow(`INSERT INTO repositories (origin, destination, rsa_key) VALUES ($1, $2, $3) RETURNING id;`, origin, destination, rsa_key).Scan(&id)
+	err = row.Scan(&id)
 	if err != nil {
 		return nil, err
 	}
@@ -52,16 +50,16 @@ func CreateRepository(origin string, destination string, rsa_key []byte) (*Repos
 }
 
 func FindRepository(id int64) (*Repository, error) {
-	db, err := GetDbConnection()
-	defer db.Close()
+	var (
+		origin      string
+		destination string
+		rsa_key     []byte
+	)
+	row, err := QueryRow("SELECT origin, destination, rsa_key FROM repositories WHERE id = $1", id)
 	if err != nil {
 		return nil, err
 	}
-
-	var origin string
-	var destination string
-	var rsa_key []byte
-	err = db.QueryRow("SELECT origin, destination, rsa_key FROM repositories WHERE id = $1", id).Scan(&origin, &destination, &rsa_key)
+	err = row.Scan(&origin, &destination, &rsa_key)
 	if err != nil {
 		return nil, err
 	}

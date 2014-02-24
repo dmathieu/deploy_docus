@@ -35,3 +35,14 @@ func GetDbConnection() (*Database, error) {
 
 	return database, nil
 }
+
+func QueryRow(query string, args ...interface{}) (*sql.Row, error) {
+	db, err := GetDbConnection()
+	defer db.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	row := db.QueryRow(query, args...)
+	return row, nil
+}
