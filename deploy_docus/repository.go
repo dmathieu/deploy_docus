@@ -25,27 +25,29 @@ func (r *Repository) LocalPath() string {
 	return fmt.Sprintf("/tmp/%s", r.Name())
 }
 
-func CreateRepository(origin string, destination string, rsa_key []byte) (*Repository, error) {
-	db, err := GetDbConnection()
-	if err != nil {
-		return nil, err
-	}
-
-	command := `INSERT INTO repositories (origin, destination, rsa_key) VALUES ($1, $2, $3) RETURNING id;`
-	var id int64
-	err = db.QueryRow(command, origin, destination, rsa_key).Scan(&id)
-	if err != nil {
-		return nil, err
-	}
-
+func BuildRepository(id int64, origin string, destination string, rsa_key []byte) *Repository {
 	repository := &Repository{
 		Id:          id,
 		Origin:      origin,
 		Destination: destination,
 	}
 	repository.Rsa = NewRsa(repository, rsa_key)
+	return repository
+}
 
-	return repository, nil
+func CreateRepository(origin string, destination string, rsa_key []byte) (*Repository, error) {
+	db, err := GetDbConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	var id int64
+	err = db.QueryRow(`INSERT INTO repositories (origin, destination, rsa_key) VALUES ($1, $2, $3) RETURNING id;`, origin, destination, rsa_key).Scan(&id)
+	if err != nil {
+		return nil, err
+	}
+
+	return BuildRepository(id, origin, destination, rsa_key), nil
 }
 
 func FindRepository(id int64) (*Repository, error) {
@@ -62,12 +64,5 @@ func FindRepository(id int64) (*Repository, error) {
 		return nil, err
 	}
 
-	repository := &Repository{
-		Id:          id,
-		Origin:      origin,
-		Destination: destination,
-	}
-	repository.Rsa = NewRsa(repository, rsa_key)
-
-	return repository, nil
+	return BuildRepository(id, origin, destination, rsa_key), nil
 }
