@@ -5,6 +5,7 @@ import (
 	"github.com/codegangsta/martini"
 	"github.com/martini-contrib/binding"
 	"net/http"
+	"strconv"
 )
 
 type Server struct {
@@ -21,9 +22,15 @@ func (c *Server) mapRoutes() {
 		return `You might be "a doctor". I am "the doctor".`
 	})
 
-	c.Post("/deploy", binding.Form(Message{}), func(message Message, channel *chan Message, req *http.Request) (int, string) {
-		message.Repository = FindRepository()
+	c.Post("/deploy/:id", binding.Form(Message{}), func(message Message, channel *chan Message, req *http.Request, params martini.Params) (int, string) {
+		id, _ := strconv.ParseInt(params["id"], 0, 0)
+		repository, err := FindRepository(id)
 
+		if err != nil {
+			return 404, ""
+		}
+
+		message.Repository = repository
 		*channel <- message
 
 		return 201, ""

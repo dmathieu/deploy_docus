@@ -28,6 +28,9 @@ func TestSuccessfulGetHome(t *testing.T) {
 }
 
 func TestSuccessfulDeploy(t *testing.T) {
+	RemoveAllRepositories()
+	tmp, err := CreateRepository(repositoryOrigin, repositoryDestination, pemPrivateKey)
+
 	channel := make(chan Message)
 	server := NewServer(80, channel)
 
@@ -48,7 +51,8 @@ func TestSuccessfulDeploy(t *testing.T) {
 		"statuses_url":   {"https://api.github.com/repos/octocat/example/deployments/1/statuses"},
 	}
 	content := bytes.NewBufferString(payload.Encode())
-	request, err := http.NewRequest("POST", "http://localhost:3000/deploy", content)
+	url := fmt.Sprintf("http://localhost:3000/deploy/%d", tmp.Id)
+	request, err := http.NewRequest("POST", url, content)
 	assert.Equal(t, nil, err)
 
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
@@ -58,11 +62,29 @@ func TestSuccessfulDeploy(t *testing.T) {
 		message := <-channel
 		assert.Equal(t, 1, message.Id)
 		assert.Equal(t, "a84d88e7554fc1fa21bcbc4efae3c782a70d2b9d", message.Sha)
+
 		assert.NotEqual(t, nil, message.Repository)
+		assert.Equal(t, tmp.Id, message.Repository.Id)
 	}
 
 	go retrieveMessage(channel)
 	server.ServeHTTP(response, request)
 
 	assert.Equal(t, http.StatusCreated, response.Code)
+}
+
+func TestMissingRepository(t *testing.T) {
+	RemoveAllRepositories()
+	server := NewServer(80, nil)
+
+	response := httptest.NewRecorder()
+	response.Body = new(bytes.Buffer)
+
+	request, err := http.NewRequest("POST", "http://localhost:3000/deploy/42", nil)
+	if err != nil {
+		panic(err)
+	}
+	server.ServeHTTP(response, request)
+
+	assert.Equal(t, http.StatusNotFound, response.Code)
 }

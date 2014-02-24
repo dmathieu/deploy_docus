@@ -2,7 +2,6 @@ package deploy_docus
 
 import (
 	"github.com/bmizerany/assert"
-	"os"
 	"testing"
 )
 
@@ -23,17 +22,26 @@ func TestLocalPath(t *testing.T) {
 }
 
 func TestSuccessfulFindRepository(t *testing.T) {
-	os.Setenv("REPOSITORY_ORIGIN", "git@github.com:dmathieu/deploy_docus.git")
-	os.Setenv("REPOSITORY_DESTINATION", "git@heroku.com:deploy_docus.git")
-	os.Setenv("REPOSITORY_PKEY", string(pemPrivateKey))
-
+	RemoveAllRepositories()
 	var repository *Repository
-	repository = FindRepository()
+	tmp, err := CreateRepository(repositoryOrigin, repositoryDestination, pemPrivateKey)
+	assert.Equal(t, nil, err)
 
-	assert.Equal(t, "git@github.com:dmathieu/deploy_docus.git", repository.Origin)
-	assert.Equal(t, "git@heroku.com:deploy_docus.git", repository.Destination)
+	repository, err = FindRepository(tmp.Id)
+
+	assert.Equal(t, nil, err)
+	assert.Equal(t, repositoryOrigin, repository.Origin)
+	assert.Equal(t, repositoryDestination, repository.Destination)
 	assert.Equal(t, pemPrivateKey, repository.Rsa.Key)
 
 	assert.NotEqual(t, nil, repository.Rsa)
 	assert.Equal(t, repository, repository.Rsa.Repository)
+}
+
+func TestFindMissingRepository(t *testing.T) {
+	RemoveAllRepositories()
+	repository, err := FindRepository(1)
+
+	assert.Equal(t, (*Repository)(nil), repository)
+	assert.NotEqual(t, nil, err)
 }
