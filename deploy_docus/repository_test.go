@@ -21,6 +21,18 @@ func TestLocalPath(t *testing.T) {
 	assert.Equal(t, "/tmp/github_hubot", repository.LocalPath())
 }
 
+func TestSuccessfulCreateRepository(t *testing.T) {
+	RemoveAllRepositories()
+
+	repository, err := CreateRepository(repositoryOrigin, repositoryDestination, pemPrivateKey)
+
+	assert.Equal(t, nil, err)
+	assert.NotEqual(t, nil, repository.Id)
+	assert.Equal(t, repositoryOrigin, repository.Origin)
+	assert.Equal(t, repositoryDestination, repository.Destination)
+	assert.Equal(t, pemPrivateKey, repository.Rsa.Key)
+}
+
 func TestSuccessfulFindRepository(t *testing.T) {
 	RemoveAllRepositories()
 	var repository *Repository
