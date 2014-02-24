@@ -22,3 +22,15 @@ func BuildTestRepository() *Repository {
 
 	return repository
 }
+
+func RemoveAllRepositories() error {
+	db, err := GetDbConnection()
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec(`TRUNCATE TABLE repositories;`)
+	if err != nil {
+		return err
+	}
+	return nil
+}
