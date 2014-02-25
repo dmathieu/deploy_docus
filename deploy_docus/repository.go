@@ -68,7 +68,7 @@ func FindRepository(id int64) (*Repository, error) {
 		destination string
 		rsa_key     []byte
 	)
-	row, err := QueryRow("SELECT origin, destination, rsa_key FROM repositories WHERE id = $1", id)
+	row, err := QueryRow(`SELECT origin, destination, rsa_key FROM repositories WHERE id = $1`, id)
 	if err != nil {
 		return nil, err
 	}
@@ -78,4 +78,36 @@ func FindRepository(id int64) (*Repository, error) {
 	}
 
 	return BuildRepository(id, origin, destination, rsa_key), nil
+}
+
+func AllRepositories() ([]Repository, error) {
+	var count int64
+	row, err := QueryRow(`SELECT COUNT(id) FROM repositories`)
+  if err != nil {
+    return nil, err
+  }
+	row.Scan(&count)
+
+	repositories := make([]Repository, count)
+	rows, err := Query(`SELECT id, origin, destination, rsa_key FROM repositories`)
+	if err != nil {
+		return nil, err
+	}
+
+	i := 0
+	for rows.Next() {
+		var (
+			id          int64
+			origin      string
+			destination string
+			rsa_key     []byte
+		)
+
+		rows.Scan(&id, &origin, &destination, &rsa_key)
+		repository := BuildRepository(id, origin, destination, rsa_key)
+		repositories[i] = *repository
+		i += 1
+	}
+
+	return repositories, nil
 }

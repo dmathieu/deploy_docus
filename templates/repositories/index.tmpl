@@ -1,0 +1,21 @@
+<table>
+  <thead>
+    <tr>
+      <td>Id</td>
+      <td>Name</td>
+      <td>Origin</td>
+      <td>Destination</td>
+    </tr>
+  </thead>
+
+  <tbody>
+    {{range .}}
+      <tr>
+        <td>{{.Id}}</td>
+        <td>{{.Name}}</td>
+        <td>{{.Origin}}</td>
+        <td>{{.Destination}}</td>
+      </tr>
+    {{ end }}
+  </tbody>
+</table>

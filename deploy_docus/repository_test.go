@@ -80,3 +80,25 @@ func TestFindMissingRepository(t *testing.T) {
 	assert.Equal(t, (*Repository)(nil), repository)
 	assert.NotEqual(t, nil, err)
 }
+
+func TestFindAll(t *testing.T) {
+	RemoveAllRepositories()
+
+	tmp := BuildTestRepository()
+	_ = tmp.Save()
+	tmp = BuildTestRepository()
+	_ = tmp.Save()
+
+	repositories, err := AllRepositories()
+
+	assert.Equal(t, nil, err)
+	assert.Equal(t, 2, len(repositories))
+
+	first := repositories[0]
+	assert.Equal(t, repositoryOrigin, first.Origin)
+	assert.Equal(t, repositoryDestination, first.Destination)
+
+	second := repositories[0]
+	assert.Equal(t, repositoryOrigin, second.Origin)
+	assert.Equal(t, repositoryDestination, second.Destination)
+}

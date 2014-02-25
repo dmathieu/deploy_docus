@@ -3,6 +3,7 @@ package deploy_docus
 import (
 	"fmt"
 	"github.com/codegangsta/martini"
+	"github.com/codegangsta/martini-contrib/render"
 	"github.com/martini-contrib/binding"
 	"github.com/martini-contrib/oauth2"
 	"github.com/martini-contrib/sessions"
@@ -19,6 +20,9 @@ type Server struct {
 
 func (c *Server) mapRoutes() {
 	c.Map(&c.Deploys)
+	c.Use(render.Renderer(render.Options{
+		Layout: "layout",
+	}))
 
 	github := BuildGitHub()
 	c.Use(sessions.Sessions("deploy_docus", sessions.NewCookieStore([]byte("secret123"))))
@@ -49,6 +53,27 @@ func (c *Server) mapRoutes() {
 		*channel <- message
 
 		return 201, ""
+	})
+
+	c.Get("/repositories", oauth2.LoginRequired, func(r render.Render) {
+		repositories, _ := AllRepositories()
+
+		r.HTML(200, "repositories/index", repositories)
+	})
+
+	c.Get("/repositories/new", oauth2.LoginRequired, func(r render.Render) {
+		repository := &Repository{}
+		r.HTML(200, "repositories/new", repository)
+	})
+
+	c.Post("/repositories", oauth2.LoginRequired, func(req *http.Request, writer http.ResponseWriter) {
+		origin := req.FormValue("repository[origin]")
+		destination := req.FormValue("repository[destination]")
+		key := []byte(req.FormValue("repository[key]"))
+		repository := BuildRepository(0, origin, destination, key)
+		repository.Save()
+
+		http.Redirect(writer, req, "/", http.StatusMovedPermanently)
 	})
 }
 

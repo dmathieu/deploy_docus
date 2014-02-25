@@ -1,0 +1,21 @@
+<form action="/repositories" method="post">
+
+  <div class="form-group">
+    <label>Origin</label>
+    <input type="text" name="repository[origin]" class="form-control" />
+  </div>
+
+  <div class="form-group">
+    <label>Destination</label>
+    <input type="text" name="repository[destination]" class="form-control" />
+  </div>
+
+  <div class="form-group">
+    <label>Private Key</label>
+    <textarea name="repository[key]" class="form-control"></textarea>
+  </div>
+
+  <div class="form-group">
+    <input type="submit" class="btn btn-default" />
+  </div>
+</form>
