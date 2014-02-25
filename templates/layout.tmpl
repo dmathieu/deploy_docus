@@ -1,8 +1,22 @@
 <html>
   <head>
     <title>Deploy Docus</title>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
   </head>
   <body>
-    {{ yield }}
+    <div class="container">
+      <div class="header">
+        <ul class="nav nav-pills pull-right">
+          <li><a href="/repositories">Repositories</a></li>
+        </ul>
+        <h3 class="text-muted">Deploy Docus</h3>
+      </div>
+
+      {{yield}}
+    </div>
   </body>
 </html>
