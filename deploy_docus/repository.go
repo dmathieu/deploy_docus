@@ -83,9 +83,9 @@ func FindRepository(id int64) (*Repository, error) {
 func AllRepositories() ([]Repository, error) {
 	var count int64
 	row, err := QueryRow(`SELECT COUNT(id) FROM repositories`)
-  if err != nil {
-    return nil, err
-  }
+	if err != nil {
+		return nil, err
+	}
 	row.Scan(&count)
 
 	repositories := make([]Repository, count)
