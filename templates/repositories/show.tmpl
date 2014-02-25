@@ -1,0 +1,16 @@
+<h1>{{.Repository.Name}}</h1>
+
+<div class="row">
+  <label class="col-sm-2">Origin</label>
+  <div class="col-sm-10">{{.Repository.Origin}}</div>
+</div>
+
+<div class="row">
+  <label class="col-sm-2">Destination</label>
+  <div class="col-sm-10">{{.Repository.Destination}}</div>
+</div>
+
+<div class="row">
+  <label class="col-sm-2">Callback</label>
+  <div class="col-sm-10">http://{{.Host}}/deploy/{{.Repository.Id}}?token={{.Repository.Token}}</div>
+</div>

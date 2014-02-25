@@ -25,6 +25,11 @@ func (r *Repository) LocalPath() string {
 	return fmt.Sprintf("/tmp/%s", r.Name())
 }
 
+func (r *Repository) Token() string {
+  value, _ := r.Rsa.Encrypt([]byte(r.Name()))
+  return string(value)
+}
+
 func (r *Repository) IsNew() bool {
 	return r.Id == 0
 }

@@ -12,7 +12,9 @@
     {{range .}}
       <tr>
         <td>{{.Id}}</td>
-        <td>{{.Name}}</td>
+        <td>
+          <a href="/repositories/{{.Id}}">{{.Name}}</a>
+        </td>
         <td>{{.Origin}}</td>
         <td>{{.Destination}}</td>
       </tr>
