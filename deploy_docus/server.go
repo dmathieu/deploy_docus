@@ -43,9 +43,14 @@ func (c *Server) mapRoutes() {
 
 	c.Post("/deploy/:id", binding.Form(Message{}), func(message Message, channel *chan Message, req *http.Request, params martini.Params) (int, string) {
 		id, _ := strconv.ParseInt(params["id"], 0, 0)
+		token := req.URL.Query().Get("token")
 		repository, err := FindRepository(id)
 
 		if err != nil {
+			return 404, ""
+		}
+
+		if repository.Token() != token {
 			return 404, ""
 		}
 

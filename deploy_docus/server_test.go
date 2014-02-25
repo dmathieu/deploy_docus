@@ -67,7 +67,7 @@ func TestSuccessfulDeploy(t *testing.T) {
 		"statuses_url":   {"https://api.github.com/repos/octocat/example/deployments/1/statuses"},
 	}
 	content := bytes.NewBufferString(payload.Encode())
-	url := fmt.Sprintf("http://localhost:3000/deploy/%d", tmp.Id)
+	url := fmt.Sprintf("http://localhost:3000/deploy/%d?token=%s", tmp.Id, tmp.Token())
 	request, err := http.NewRequest("POST", url, content)
 	assert.Equal(t, nil, err)
 
@@ -97,6 +97,25 @@ func TestMissingRepository(t *testing.T) {
 	response.Body = new(bytes.Buffer)
 
 	request, err := http.NewRequest("POST", "http://localhost:3000/deploy/42", nil)
+	if err != nil {
+		panic(err)
+	}
+	server.ServeHTTP(response, request)
+
+	assert.Equal(t, http.StatusNotFound, response.Code)
+}
+
+func TestInvalidToken(t *testing.T) {
+	RemoveAllRepositories()
+	tmp := BuildTestRepository()
+	tmp.Save()
+	server := NewServer(80, nil)
+
+	response := httptest.NewRecorder()
+	response.Body = new(bytes.Buffer)
+
+	url := fmt.Sprintf("http://localhost:3000/deploy/%d", tmp.Id)
+	request, err := http.NewRequest("POST", url, nil)
 	if err != nil {
 		panic(err)
 	}
