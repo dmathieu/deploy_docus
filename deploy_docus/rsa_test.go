@@ -17,17 +17,6 @@ func TestSuccessfulEncrypt(t *testing.T) {
 	assert.NotEqual(t, nil, encrypted)
 }
 
-func TestSuccessfulDecrypt(t *testing.T) {
-	key, _ := BuildPrivateKey(pemPrivateKey)
-	rsa := &Rsa{Private: key}
-
-	encrypted, err := rsa.Encrypt([]byte("hello world"))
-	decrypted, err := rsa.Decrypt(encrypted)
-
-	assert.Equal(t, nil, err)
-	assert.Equal(t, []byte("hello world"), decrypted)
-}
-
 func TestNewRsa(t *testing.T) {
 	repository := &Repository{Origin: "git@github.com:dmathieu/deploy_docus.git"}
 	rsa := NewRsa(repository, pemPrivateKey)

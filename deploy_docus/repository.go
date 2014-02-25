@@ -26,8 +26,8 @@ func (r *Repository) LocalPath() string {
 }
 
 func (r *Repository) Token() string {
-  value, _ := r.Rsa.Encrypt([]byte(r.Name()))
-  return string(value)
+	value, _ := r.Rsa.Encrypt([]byte(r.Name()))
+	return value
 }
 
 func (r *Repository) IsNew() bool {

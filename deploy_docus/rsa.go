@@ -1,10 +1,10 @@
 package deploy_docus
 
 import (
-	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha1"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
@@ -18,28 +18,10 @@ type Rsa struct {
 	Key        []byte
 }
 
-func (r *Rsa) Encrypt(value []byte) ([]byte, error) {
-	var err error
-
-	var out []byte
-	out, err = rsa.EncryptOAEP(sha1.New(), rand.Reader, &r.Private.PublicKey, value, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return out, nil
-}
-
-func (r *Rsa) Decrypt(value []byte) ([]byte, error) {
-	var err error
-
-	var out []byte
-	out, err = rsa.DecryptOAEP(sha1.New(), rand.Reader, r.Private, value, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return out, nil
+func (r *Rsa) Encrypt(value []byte) (string, error) {
+	hasher := sha1.New()
+	hasher.Write([]byte(fmt.Sprintf("%s-%s", r.Key, value)))
+	return base64.URLEncoding.EncodeToString(hasher.Sum(nil)), nil
 }
 
 func (r *Rsa) WriteKey() {

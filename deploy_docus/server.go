@@ -61,16 +61,16 @@ func (c *Server) mapRoutes() {
 		r.HTML(200, "repositories/index", repositories)
 	})
 
-  c.Get("/repositories/:id", oauth2.LoginRequired, func(r render.Render, params martini.Params, req *http.Request) {
-    id, _ := strconv.ParseInt(params["id"], 0, 0)
-    repository, _ := FindRepository(id)
-    values := struct {
-      Repository *Repository
-      Host       string
-    }{repository, req.Host}
+	c.Get("/repositories/:id", oauth2.LoginRequired, func(r render.Render, params martini.Params, req *http.Request) {
+		id, _ := strconv.ParseInt(params["id"], 0, 0)
+		repository, _ := FindRepository(id)
+		values := struct {
+			Repository *Repository
+			Host       string
+		}{repository, req.Host}
 
-    r.HTML(200, "repositories/show", values)
-  })
+		r.HTML(200, "repositories/show", values)
+	})
 
 	c.Get("/repositories/new", oauth2.LoginRequired, func(r render.Render) {
 		repository := &Repository{}
