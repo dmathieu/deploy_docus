@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/codegangsta/martini"
 	"github.com/martini-contrib/binding"
+	"github.com/martini-contrib/oauth2"
+	"github.com/martini-contrib/sessions"
 	"net/http"
 	"strconv"
 )
@@ -18,8 +20,21 @@ type Server struct {
 func (c *Server) mapRoutes() {
 	c.Map(&c.Deploys)
 
-	c.Get("/", func() string {
-		return `You might be "a doctor". I am "the doctor".`
+	github := BuildGitHub()
+	c.Use(sessions.Sessions("deploy_docus", sessions.NewCookieStore([]byte("secret123"))))
+	c.Use(oauth2.Github(&oauth2.Options{
+		ClientId:     github.OauthKey,
+		ClientSecret: github.OauthSecret,
+		RedirectURL:  github.OauthRedirectUri,
+		Scopes:       []string{""},
+	}))
+
+	c.Get("/", func(tokens oauth2.Tokens) string {
+		if tokens.IsExpired() {
+			return `You might be "a doctor". I am "the doctor".`
+		} else {
+			return `Come along Pond!`
+		}
 	})
 
 	c.Post("/deploy/:id", binding.Form(Message{}), func(message Message, channel *chan Message, req *http.Request, params martini.Params) (int, string) {
