@@ -29,7 +29,8 @@ func TestSuccessfulGetHome(t *testing.T) {
 
 func TestSuccessfulDeploy(t *testing.T) {
 	RemoveAllRepositories()
-	tmp, err := CreateRepository(repositoryOrigin, repositoryDestination, pemPrivateKey)
+	tmp := BuildTestRepository()
+	tmp.Save()
 
 	channel := make(chan Message)
 	server := NewServer(80, channel)

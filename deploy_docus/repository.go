@@ -25,6 +25,33 @@ func (r *Repository) LocalPath() string {
 	return fmt.Sprintf("/tmp/%s", r.Name())
 }
 
+func (r *Repository) IsNew() bool {
+	return r.Id == 0
+}
+
+func (r *Repository) Save() error {
+	var id int64
+
+	if r.IsNew() {
+		row, err := QueryRow(`INSERT INTO repositories (origin, destination, rsa_key) VALUES ($1, $2, $3) RETURNING id;`, r.Origin, r.Destination, r.Rsa.Key)
+		if err != nil {
+			return err
+		}
+		err = row.Scan(&id)
+		if err != nil {
+			return err
+		}
+		r.Id = id
+	} else {
+		_, err := QueryRow(`UPDATE repositories SET origin = $1, destination = $2, rsa_key = $3 WHERE id = $4`, r.Origin, r.Destination, r.Rsa.Key, r.Id)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func BuildRepository(id int64, origin string, destination string, rsa_key []byte) *Repository {
 	repository := &Repository{
 		Id:          id,
@@ -33,20 +60,6 @@ func BuildRepository(id int64, origin string, destination string, rsa_key []byte
 	}
 	repository.Rsa = NewRsa(repository, rsa_key)
 	return repository
-}
-
-func CreateRepository(origin string, destination string, rsa_key []byte) (*Repository, error) {
-	var id int64
-	row, err := QueryRow(`INSERT INTO repositories (origin, destination, rsa_key) VALUES ($1, $2, $3) RETURNING id;`, origin, destination, rsa_key)
-	if err != nil {
-		return nil, err
-	}
-	err = row.Scan(&id)
-	if err != nil {
-		return nil, err
-	}
-
-	return BuildRepository(id, origin, destination, rsa_key), nil
 }
 
 func FindRepository(id int64) (*Repository, error) {
