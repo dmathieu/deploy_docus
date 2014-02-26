@@ -52,3 +52,10 @@ func TestKeyPath(t *testing.T) {
 	rsa.Repository.Origin = "git@github.com:github/hubot.git"
 	assert.Equal(t, "/tmp/deploy_docus/keys/github_hubot", rsa.KeyPath())
 }
+
+func TestPublicKey(t *testing.T) {
+	repository := BuildTestRepository()
+	rsa := repository.Rsa
+
+	assert.Equal(t, "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAQQCymQ9JxH36jNQArmpNG4o7ahNkKyPyiwA7+5d5Ct6aTMgriyqBdH3ewItiluU6CMMxaH7yXEv0k2uhwOYEHp0V\n", rsa.PublicKey())
+}

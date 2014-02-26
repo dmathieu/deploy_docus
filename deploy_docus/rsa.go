@@ -1,6 +1,7 @@
 package deploy_docus
 
 import (
+	"code.google.com/p/go.crypto/ssh"
 	"crypto/rsa"
 	"crypto/sha1"
 	"crypto/x509"
@@ -36,6 +37,14 @@ func (r *Rsa) WriteKey() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (r *Rsa) PublicKey() string {
+	key, _ := ssh.NewPublicKey(&r.Private.PublicKey)
+	marshalled := ssh.MarshalPublicKey(key)
+	encoded := base64.StdEncoding.EncodeToString(marshalled) + "\n"
+
+	return fmt.Sprintf("ssh-rsa %s", encoded)
 }
 
 func (r *Rsa) KeyPath() string {
