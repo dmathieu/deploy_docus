@@ -8,6 +8,8 @@ import (
 	"github.com/martini-contrib/oauth2"
 	"github.com/martini-contrib/sessions"
 	"net/http"
+	"path"
+	"runtime"
 	"strconv"
 )
 
@@ -20,8 +22,12 @@ type Server struct {
 
 func (c *Server) mapRoutes() {
 	c.Map(&c.Deploys)
+
+	_, filename, _, _ := runtime.Caller(1)
+	template_directory := path.Join(path.Dir(filename), "..", "templates")
 	c.Use(render.Renderer(render.Options{
-		Layout: "layout",
+		Layout:    "layout",
+		Directory: template_directory,
 	}))
 
 	github := BuildGitHub()
@@ -62,7 +68,6 @@ func (c *Server) mapRoutes() {
 
 	c.Get("/repositories", oauth2.LoginRequired, func(r render.Render) {
 		repositories, _ := AllRepositories()
-
 		r.HTML(200, "repositories/index", repositories)
 	})
 

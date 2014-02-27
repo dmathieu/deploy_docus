@@ -85,13 +85,21 @@ func FindRepository(id int64) (*Repository, error) {
 	return BuildRepository(id, origin, destination, rsa_key), nil
 }
 
-func AllRepositories() ([]Repository, error) {
+func RepositoriesCount() (int64, error) {
 	var count int64
 	row, err := QueryRow(`SELECT COUNT(id) FROM repositories`)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 	row.Scan(&count)
+	return count, nil
+}
+
+func AllRepositories() ([]Repository, error) {
+	count, err := RepositoriesCount()
+	if err != nil {
+		return nil, err
+	}
 
 	repositories := make([]Repository, count)
 	rows, err := Query(`SELECT id, origin, destination, rsa_key FROM repositories`)
