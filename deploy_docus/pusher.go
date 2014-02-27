@@ -29,7 +29,7 @@ func (p *Pusher) BuildCmd() *exec.Cmd {
 
 func (p *Pusher) Push() error {
 	command := p.BuildCmd()
-  fmt.Println(command)
+	fmt.Println(command)
 	_, err := command.Output()
 
 	if err != nil {
