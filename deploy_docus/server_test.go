@@ -10,7 +10,7 @@ import (
 )
 
 func TestSuccessfulGetHome(t *testing.T) {
-	server := NewServer(80, nil)
+	server := NewServer(80, nil, ServerPath())
 
 	response := httptest.NewRecorder()
 	response.Body = new(bytes.Buffer)
@@ -26,7 +26,7 @@ func TestSuccessfulGetHome(t *testing.T) {
 }
 
 func TestSuccessfulGetLogin(t *testing.T) {
-	server := NewServer(80, nil)
+	server := NewServer(80, nil, ServerPath())
 
 	response := httptest.NewRecorder()
 	response.Body = new(bytes.Buffer)

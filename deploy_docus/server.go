@@ -9,13 +9,13 @@ import (
 	"github.com/martini-contrib/sessions"
 	"net/http"
 	"path"
-	"runtime"
 	"strconv"
 )
 
 type Server struct {
 	Port    int64
 	Deploys chan Message
+	Path    string
 
 	*martini.ClassicMartini
 }
@@ -23,11 +23,9 @@ type Server struct {
 func (c *Server) mapRoutes() {
 	c.Map(&c.Deploys)
 
-	_, filename, _, _ := runtime.Caller(1)
-	template_directory := path.Join(path.Dir(filename), "..", "templates")
 	c.Use(render.Renderer(render.Options{
 		Layout:    "layout",
-		Directory: template_directory,
+		Directory: path.Join(c.Path, "templates"),
 	}))
 
 	github := BuildGitHub()
@@ -101,9 +99,9 @@ func (c *Server) Start() {
 	http.ListenAndServe(fmt.Sprintf(":%d", c.Port), c)
 }
 
-func NewServer(port int64, channel chan Message) *Server {
+func NewServer(port int64, channel chan Message, path string) *Server {
 	martini := martini.Classic()
-	server := &Server{port, channel, martini}
+	server := &Server{port, channel, path, martini}
 	server.mapRoutes()
 	return server
 }

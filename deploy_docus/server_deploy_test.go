@@ -17,7 +17,7 @@ func TestSuccessfulDeploy(t *testing.T) {
 	tmp.Save()
 
 	channel := make(chan Message)
-	server := NewServer(80, channel)
+	server := NewServer(80, channel, ServerPath())
 
 	response := httptest.NewRecorder()
 	response.Body = new(bytes.Buffer)
@@ -60,7 +60,7 @@ func TestSuccessfulDeploy(t *testing.T) {
 
 func TestDeployMissingRepository(t *testing.T) {
 	RemoveAllRepositories()
-	server := NewServer(80, nil)
+	server := NewServer(80, nil, ServerPath())
 
 	response := httptest.NewRecorder()
 	response.Body = new(bytes.Buffer)
@@ -78,7 +78,7 @@ func TestDeployInvalidToken(t *testing.T) {
 	RemoveAllRepositories()
 	tmp := BuildTestRepository()
 	tmp.Save()
-	server := NewServer(80, nil)
+	server := NewServer(80, nil, ServerPath())
 
 	response := httptest.NewRecorder()
 	response.Body = new(bytes.Buffer)

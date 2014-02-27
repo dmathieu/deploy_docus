@@ -12,7 +12,7 @@ import (
 )
 
 func TestUnauthorizedGetRepositoriesList(t *testing.T) {
-	server := NewServer(80, nil)
+	server := NewServer(80, nil, ServerPath())
 
 	response := httptest.NewRecorder()
 	request, err := http.NewRequest("GET", "/repositories", nil)
@@ -25,7 +25,7 @@ func TestUnauthorizedGetRepositoriesList(t *testing.T) {
 }
 
 func TestSuccessfulGetRepositoriesList(t *testing.T) {
-	server := NewServer(80, nil)
+	server := NewServer(80, nil, ServerPath())
 
 	request, err := http.NewRequest("GET", "/repositories", nil)
 	if err != nil {
@@ -39,7 +39,7 @@ func TestSuccessfulGetRepositoriesList(t *testing.T) {
 }
 
 func TestUnauthorizedGetRepositoryNew(t *testing.T) {
-	server := NewServer(80, nil)
+	server := NewServer(80, nil, ServerPath())
 
 	response := httptest.NewRecorder()
 	request, err := http.NewRequest("GET", "/repositories/new", nil)
@@ -52,7 +52,7 @@ func TestUnauthorizedGetRepositoryNew(t *testing.T) {
 }
 
 func TestSuccessfulGetRepositoryNew(t *testing.T) {
-	server := NewServer(80, nil)
+	server := NewServer(80, nil, ServerPath())
 
 	request, err := http.NewRequest("GET", "/repositories/new", nil)
 	if err != nil {
@@ -69,7 +69,7 @@ func TestUnauthorizedGetRepository(t *testing.T) {
 	RemoveAllRepositories()
 	repository := BuildTestRepository()
 	repository.Save()
-	server := NewServer(80, nil)
+	server := NewServer(80, nil, ServerPath())
 
 	response := httptest.NewRecorder()
 	url := fmt.Sprintf("/repositories/%d", repository.Id)
@@ -86,7 +86,7 @@ func TestSuccessfulGetRepository(t *testing.T) {
 	RemoveAllRepositories()
 	repository := BuildTestRepository()
 	repository.Save()
-	server := NewServer(80, nil)
+	server := NewServer(80, nil, ServerPath())
 
 	url := fmt.Sprintf("/repositories/%d", repository.Id)
 	request, err := http.NewRequest("GET", url, nil)
@@ -101,7 +101,7 @@ func TestSuccessfulGetRepository(t *testing.T) {
 }
 
 func TestUnauthorizedPostCreateRepository(t *testing.T) {
-	server := NewServer(80, nil)
+	server := NewServer(80, nil, ServerPath())
 
 	response := httptest.NewRecorder()
 	request, err := http.NewRequest("POST", "/repositories", nil)
@@ -114,7 +114,7 @@ func TestUnauthorizedPostCreateRepository(t *testing.T) {
 }
 
 func TestSuccessfulPostCreateRepository(t *testing.T) {
-	server := NewServer(80, nil)
+	server := NewServer(80, nil, ServerPath())
 
 	payload := url.Values{
 		"repository[origin]":      {repositoryOrigin},

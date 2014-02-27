@@ -5,6 +5,8 @@ import (
 	"github.com/martini-contrib/sessions"
 	"net/http"
 	"net/http/httptest"
+	"path"
+	"runtime"
 	"testing"
 )
 
@@ -52,4 +54,9 @@ func LoginTest(t *testing.T, server *Server, request *http.Request) {
 	server.ServeHTTP(loginResponse, login)
 	assert.Equal(t, http.StatusOK, loginResponse.Code)
 	request.Header.Set("Cookie", loginResponse.Header().Get("Set-Cookie"))
+}
+
+func ServerPath() string {
+	_, filename, _, _ := runtime.Caller(1)
+	return path.Join(path.Dir(filename), "..")
 }
