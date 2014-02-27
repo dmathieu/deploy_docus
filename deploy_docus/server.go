@@ -31,7 +31,7 @@ func (c *Server) mapRoutes() {
 	}))
 
 	github := BuildGitHub()
-	c.Use(sessions.Sessions("deploy_docus", sessions.NewCookieStore([]byte("secret123"))))
+	c.Use(sessions.Sessions("deploy_docus", sessions.NewCookieStore(github.SessionToken)))
 	c.Use(oauth2.Github(&oauth2.Options{
 		ClientId:     github.OauthKey,
 		ClientSecret: github.OauthSecret,
