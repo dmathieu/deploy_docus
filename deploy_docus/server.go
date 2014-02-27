@@ -66,6 +66,11 @@ func (c *Server) mapRoutes() {
 		r.HTML(200, "repositories/index", repositories)
 	})
 
+	c.Get("/repositories/new", oauth2.LoginRequired, func(r render.Render) {
+		repository := &Repository{}
+		r.HTML(200, "repositories/new", repository)
+	})
+
 	c.Get("/repositories/:id", oauth2.LoginRequired, func(r render.Render, params martini.Params, req *http.Request) {
 		id, _ := strconv.ParseInt(params["id"], 0, 0)
 		repository, _ := FindRepository(id)
@@ -77,19 +82,13 @@ func (c *Server) mapRoutes() {
 		r.HTML(200, "repositories/show", values)
 	})
 
-	c.Get("/repositories/new", oauth2.LoginRequired, func(r render.Render) {
-		repository := &Repository{}
-		r.HTML(200, "repositories/new", repository)
-	})
-
 	c.Post("/repositories", oauth2.LoginRequired, func(req *http.Request, writer http.ResponseWriter) {
 		origin := req.FormValue("repository[origin]")
 		destination := req.FormValue("repository[destination]")
-		key := []byte(req.FormValue("repository[key]"))
-		repository := BuildRepository(0, origin, destination, key)
+		repository := BuildRepository(0, origin, destination, nil)
 		repository.Save()
 
-		http.Redirect(writer, req, "/", http.StatusMovedPermanently)
+		http.Redirect(writer, req, "/repositories", http.StatusMovedPermanently)
 	})
 }
 

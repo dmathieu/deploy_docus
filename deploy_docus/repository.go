@@ -38,7 +38,7 @@ func (r *Repository) Save() error {
 	var id int64
 
 	if r.IsNew() {
-		row, err := QueryRow(`INSERT INTO repositories (origin, destination, rsa_key) VALUES ($1, $2, $3) RETURNING id;`, r.Origin, r.Destination, r.Rsa.Key)
+		row, err := QueryRow(`INSERT INTO repositories (origin, destination, rsa_key) VALUES ($1, $2, $3) RETURNING id;`, r.Origin, r.Destination, r.Rsa.PrivateKey())
 		if err != nil {
 			return err
 		}
@@ -48,7 +48,7 @@ func (r *Repository) Save() error {
 		}
 		r.Id = id
 	} else {
-		_, err := QueryRow(`UPDATE repositories SET origin = $1, destination = $2, rsa_key = $3 WHERE id = $4`, r.Origin, r.Destination, r.Rsa.Key, r.Id)
+		_, err := QueryRow(`UPDATE repositories SET origin = $1, destination = $2, rsa_key = $3 WHERE id = $4`, r.Origin, r.Destination, r.Rsa.PrivateKey(), r.Id)
 		if err != nil {
 			return err
 		}
@@ -63,7 +63,7 @@ func BuildRepository(id int64, origin string, destination string, rsa_key []byte
 		Origin:      origin,
 		Destination: destination,
 	}
-	repository.Rsa = NewRsa(repository, rsa_key)
+	repository.Rsa = BuildRsa(repository, rsa_key)
 	return repository
 }
 

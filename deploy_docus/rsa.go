@@ -2,6 +2,7 @@ package deploy_docus
 
 import (
 	"code.google.com/p/go.crypto/ssh"
+	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha1"
 	"crypto/x509"
@@ -16,12 +17,11 @@ import (
 type Rsa struct {
 	Repository *Repository
 	Private    *rsa.PrivateKey
-	Key        []byte
 }
 
 func (r *Rsa) Encrypt(value []byte) (string, error) {
 	hasher := sha1.New()
-	hasher.Write([]byte(fmt.Sprintf("%s-%s", r.Key, value)))
+	hasher.Write([]byte(fmt.Sprintf("%s-%s", r.PrivateKey(), value)))
 	return base64.URLEncoding.EncodeToString(hasher.Sum(nil)), nil
 }
 
@@ -33,10 +33,16 @@ func (r *Rsa) WriteKey() {
 		panic(err)
 	}
 
-	err = ioutil.WriteFile(path, r.Key, 0700)
+	err = ioutil.WriteFile(path, r.PrivateKey(), 0700)
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (r *Rsa) PrivateKey() []byte {
+	marshalled := x509.MarshalPKCS1PrivateKey(r.Private)
+	encoded := base64.StdEncoding.EncodeToString(marshalled) + "\n"
+	return []byte(fmt.Sprintf("-----BEGIN RSA PRIVATE KEY-----\n%s-----END RSA PRIVATE KEY-----\n", encoded))
 }
 
 func (r *Rsa) PublicKey() string {
@@ -52,18 +58,20 @@ func (r *Rsa) KeyPath() string {
 }
 
 func BuildPrivateKey(content []byte) (*rsa.PrivateKey, error) {
-	block, _ := pem.Decode(content)
-	return x509.ParsePKCS1PrivateKey(block.Bytes)
+	if content == nil {
+		return rsa.GenerateKey(rand.Reader, 1024)
+	} else {
+		block, _ := pem.Decode(content)
+		return x509.ParsePKCS1PrivateKey(block.Bytes)
+	}
 }
 
-func NewRsa(repository *Repository, ssh_key []byte) *Rsa {
-	rsa := &Rsa{Repository: repository, Key: ssh_key}
-
-	key, err := BuildPrivateKey(rsa.Key)
+func BuildRsa(repository *Repository, ssh_key []byte) *Rsa {
+	key, err := BuildPrivateKey(ssh_key)
 	if err != nil {
 		panic(err)
 	}
-	rsa.Private = key
+	rsa := &Rsa{repository, key}
 	rsa.WriteKey()
 
 	return rsa

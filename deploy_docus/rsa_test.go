@@ -17,11 +17,18 @@ func TestSuccessfulEncrypt(t *testing.T) {
 	assert.NotEqual(t, nil, encrypted)
 }
 
-func TestNewRsa(t *testing.T) {
+func TestBuildRsa(t *testing.T) {
 	repository := &Repository{Origin: "git@github.com:dmathieu/deploy_docus.git"}
-	rsa := NewRsa(repository, pemPrivateKey)
+	rsa := BuildRsa(repository, pemPrivateKey)
 
 	assert.Equal(t, repository, rsa.Repository)
+	assert.NotEqual(t, nil, rsa.Private)
+}
+
+func TestBuildRsaWithoutPrivateKey(t *testing.T) {
+	repository := &Repository{Origin: "git@github.com:dmathieu/deploy_docus.git"}
+	rsa := BuildRsa(repository, nil)
+
 	assert.NotEqual(t, nil, rsa.Private)
 }
 
@@ -29,7 +36,8 @@ func TestCreateKeyFile(t *testing.T) {
 	os.RemoveAll("/tmp/deploy_docus/keys")
 
 	repository := &Repository{Origin: "git@github.com:dmathieu/deploy_docus.git"}
-	rsa := &Rsa{Repository: repository, Key: pemPrivateKey}
+	privateKey, _ := BuildPrivateKey(pemPrivateKey)
+	rsa := &Rsa{repository, privateKey}
 
 	_, err := os.Stat(rsa.KeyPath())
 	assert.Equal(t, true, os.IsNotExist(err))
@@ -51,6 +59,13 @@ func TestKeyPath(t *testing.T) {
 
 	rsa.Repository.Origin = "git@github.com:github/hubot.git"
 	assert.Equal(t, "/tmp/deploy_docus/keys/github_hubot", rsa.KeyPath())
+}
+
+func TestPrivateKey(t *testing.T) {
+	repository := BuildTestRepository()
+	rsa := repository.Rsa
+
+	assert.Equal(t, pemPrivateKey, rsa.PrivateKey())
 }
 
 func TestPublicKey(t *testing.T) {
