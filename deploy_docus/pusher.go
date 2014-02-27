@@ -22,13 +22,14 @@ func (p *Pusher) BuildCmd() *exec.Cmd {
 	return &exec.Cmd{
 		Path: path,
 		Dir:  p.Repository.LocalPath(),
-		Args: []string{"git", "push", p.Repository.Destination, p.Ref(), "-f"},
+		Args: []string{"cd", p.Repository.LocalPath(), ";", "git", "push", p.Repository.Destination, p.Ref(), "-f"},
 		Env:  []string{"GIT_SSH=script/ssh", fmt.Sprintf("PKEY=%s", p.Repository.Rsa.KeyPath())},
 	}
 }
 
 func (p *Pusher) Push() error {
 	command := p.BuildCmd()
+  fmt.Println(command)
 	_, err := command.Output()
 
 	if err != nil {

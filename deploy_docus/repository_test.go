@@ -42,16 +42,15 @@ func TestSuccessfulSave(t *testing.T) {
 	tmp, _ := FindRepository(repository.Id)
 	assert.Equal(t, repository.Origin, tmp.Origin)
 	assert.Equal(t, repository.Destination, tmp.Destination)
-	assert.Equal(t, repository.Rsa.PrivateKey(), tmp.Rsa.PrivateKey())
 
 	repository.Origin = "git@github.com:lyonrb/biceps.git"
 	repository.Destination = "git@heroku.com:biceps.git"
-	repository.Save()
+	err = repository.Save()
+	assert.Equal(t, nil, err)
 
 	tmp, _ = FindRepository(repository.Id)
 	assert.Equal(t, repository.Origin, tmp.Origin)
 	assert.Equal(t, repository.Destination, tmp.Destination)
-	assert.Equal(t, repository.Rsa.PrivateKey(), tmp.Rsa.PrivateKey())
 }
 
 func TestSuccessfulFindRepository(t *testing.T) {
@@ -67,7 +66,6 @@ func TestSuccessfulFindRepository(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, repositoryOrigin, repository.Origin)
 	assert.Equal(t, repositoryDestination, repository.Destination)
-	assert.Equal(t, pemPrivateKey, repository.Rsa.PrivateKey())
 
 	assert.NotEqual(t, nil, repository.Rsa)
 	assert.Equal(t, repository, repository.Rsa.Repository)

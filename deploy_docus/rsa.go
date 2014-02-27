@@ -21,28 +21,39 @@ type Rsa struct {
 
 func (r *Rsa) Encrypt(value []byte) (string, error) {
 	hasher := sha1.New()
-	hasher.Write([]byte(fmt.Sprintf("%s-%s", r.PrivateKey(), value)))
+	key, err := r.PrivateKey()
+	if err != nil {
+		return "", err
+	}
+
+	hasher.Write([]byte(fmt.Sprintf("%s-%s", key, value)))
 	return base64.URLEncoding.EncodeToString(hasher.Sum(nil)), nil
 }
 
-func (r *Rsa) WriteKey() {
+func (r *Rsa) WriteKey() error {
 	path := r.KeyPath()
 
 	err := os.MkdirAll(filepath.Dir(path), 0700)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-	err = ioutil.WriteFile(path, r.PrivateKey(), 0700)
+	key, _ := r.PrivateKey()
 	if err != nil {
-		panic(err)
+		return err
 	}
+	err = ioutil.WriteFile(path, key, 0700)
+	return err
 }
 
-func (r *Rsa) PrivateKey() []byte {
-	marshalled := x509.MarshalPKCS1PrivateKey(r.Private)
-	encoded := base64.StdEncoding.EncodeToString(marshalled) + "\n"
-	return []byte(fmt.Sprintf("-----BEGIN RSA PRIVATE KEY-----\n%s-----END RSA PRIVATE KEY-----\n", encoded))
+func (r *Rsa) PrivateKey() ([]byte, error) {
+	cert := x509.MarshalPKCS1PrivateKey(r.Private)
+	blk := new(pem.Block)
+	blk.Type = "RSA PRIVATE KEY"
+	blk.Bytes = cert
+	content := pem.EncodeToMemory(blk)
+
+	return content, nil
 }
 
 func (r *Rsa) PublicKey() string {

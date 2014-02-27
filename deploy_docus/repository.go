@@ -37,8 +37,13 @@ func (r *Repository) IsNew() bool {
 func (r *Repository) Save() error {
 	var id int64
 
+	key, err := r.Rsa.PrivateKey()
+	if err != nil {
+		return err
+	}
+
 	if r.IsNew() {
-		row, err := QueryRow(`INSERT INTO repositories (origin, destination, rsa_key) VALUES ($1, $2, $3) RETURNING id;`, r.Origin, r.Destination, r.Rsa.PrivateKey())
+		row, err := QueryRow(`INSERT INTO repositories (origin, destination, rsa_key) VALUES ($1, $2, $3) RETURNING id;`, r.Origin, r.Destination, key)
 		if err != nil {
 			return err
 		}
@@ -48,7 +53,7 @@ func (r *Repository) Save() error {
 		}
 		r.Id = id
 	} else {
-		_, err := QueryRow(`UPDATE repositories SET origin = $1, destination = $2, rsa_key = $3 WHERE id = $4`, r.Origin, r.Destination, r.Rsa.PrivateKey(), r.Id)
+		_, err := QueryRow(`UPDATE repositories SET origin = $1, destination = $2, rsa_key = $3 WHERE id = $4`, r.Origin, r.Destination, key, r.Id)
 		if err != nil {
 			return err
 		}

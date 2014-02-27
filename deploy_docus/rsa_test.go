@@ -8,10 +8,8 @@ import (
 )
 
 func TestSuccessfulEncrypt(t *testing.T) {
-	key, _ := BuildPrivateKey(pemPrivateKey)
-	rsa := &Rsa{Private: key}
-
-	encrypted, err := rsa.Encrypt([]byte("hello"))
+	repository := BuildTestRepository()
+	encrypted, err := repository.Rsa.Encrypt([]byte("hello"))
 
 	assert.Equal(t, nil, err)
 	assert.NotEqual(t, nil, encrypted)
@@ -48,7 +46,9 @@ func TestCreateKeyFile(t *testing.T) {
 	assert.Equal(t, false, os.IsNotExist(err))
 
 	content, err := ioutil.ReadFile(rsa.KeyPath())
-	assert.Equal(t, pemPrivateKey, content)
+	privateKey, _ = BuildPrivateKey(content)
+
+	assert.Equal(t, privateKey, rsa.Private)
 }
 
 func TestKeyPath(t *testing.T) {
@@ -63,9 +63,10 @@ func TestKeyPath(t *testing.T) {
 
 func TestPrivateKey(t *testing.T) {
 	repository := BuildTestRepository()
-	rsa := repository.Rsa
+	key, _ := repository.Rsa.PrivateKey()
+	privateKey, _ := BuildPrivateKey(key)
 
-	assert.Equal(t, pemPrivateKey, rsa.PrivateKey())
+	assert.Equal(t, privateKey, repository.Rsa.Private)
 }
 
 func TestPublicKey(t *testing.T) {
