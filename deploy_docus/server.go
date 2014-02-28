@@ -34,7 +34,7 @@ func (c *Server) mapRoutes() {
 		ClientId:     github.OauthKey,
 		ClientSecret: github.OauthSecret,
 		RedirectURL:  github.OauthRedirectUri,
-		Scopes:       []string{""},
+		Scopes:       []string{"repo_deployment", "read:org"},
 	}))
 
 	c.Get("/", func(tokens oauth2.Tokens) string {
@@ -64,17 +64,17 @@ func (c *Server) mapRoutes() {
 		return 201, ""
 	})
 
-	c.Get("/repositories", oauth2.LoginRequired, func(r render.Render) {
+	c.Get("/repositories", GitHubLoginRequired, func(r render.Render) {
 		repositories, _ := AllRepositories()
 		r.HTML(200, "repositories/index", repositories)
 	})
 
-	c.Get("/repositories/new", oauth2.LoginRequired, func(r render.Render) {
+	c.Get("/repositories/new", GitHubLoginRequired, func(r render.Render) {
 		repository := &Repository{}
 		r.HTML(200, "repositories/new", repository)
 	})
 
-	c.Get("/repositories/:id", oauth2.LoginRequired, func(r render.Render, params martini.Params, req *http.Request) {
+	c.Get("/repositories/:id", GitHubLoginRequired, func(r render.Render, params martini.Params, req *http.Request) {
 		id, _ := strconv.ParseInt(params["id"], 0, 0)
 		repository, _ := FindRepository(id)
 		values := struct {
@@ -85,7 +85,7 @@ func (c *Server) mapRoutes() {
 		r.HTML(200, "repositories/show", values)
 	})
 
-	c.Post("/repositories", oauth2.LoginRequired, func(req *http.Request, writer http.ResponseWriter) {
+	c.Post("/repositories", GitHubLoginRequired, func(req *http.Request, writer http.ResponseWriter) {
 		origin := req.FormValue("repository[origin]")
 		destination := req.FormValue("repository[destination]")
 		repository := BuildRepository(0, origin, destination, nil)

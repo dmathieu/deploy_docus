@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"github.com/dmathieu/deploy_docus/deploy_docus"
 	"os"
+	"path"
+	"path/filepath"
+	"runtime"
 	"strconv"
 )
 
@@ -20,6 +23,18 @@ func getPort() int64 {
 	} else {
 		return 5000
 	}
+}
+
+func getPath() string {
+	directory, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	_, err := os.Stat(path.Join(directory, "templates"))
+
+	if err != nil {
+		_, filename, _, _ := runtime.Caller(1)
+		directory = path.Join(path.Dir(filename))
+	}
+
+	return directory
 }
 
 func deploy(message deploy_docus.Message) {

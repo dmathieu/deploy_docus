@@ -41,7 +41,8 @@ func RemoveAllRepositories() error {
 
 func LoginTest(t *testing.T, server *Server, request *http.Request) {
 	server.Get("/test_login", func(s sessions.Session) string {
-		s.Set("oauth2_token", []byte("{\"AccessToken\":\"\",\"RefreshToken\":\"\",\"Expiry\":\"2025-01-01T00:00:00Z\",\"Extra\":null}"))
+		s.Set("oauth2_token", []byte("{\"AccessToken\":\"hello_world\",\"RefreshToken\":\"\",\"Expiry\":\"2025-01-01T00:00:00Z\",\"Extra\":null}"))
+		s.Set("isAllowed", true)
 		return "OK"
 	})
 
