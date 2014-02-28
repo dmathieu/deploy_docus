@@ -37,11 +37,11 @@ func (c *Server) mapRoutes() {
 		Scopes:       []string{"repo_deployment", "read:org"},
 	}))
 
-	c.Get("/", func(tokens oauth2.Tokens) string {
+	c.Get("/", func(tokens oauth2.Tokens, writer http.ResponseWriter, req *http.Request) {
 		if tokens.IsExpired() {
-			return `You might be "a doctor". I am "the doctor".`
+			http.Redirect(writer, req, "/login", http.StatusMovedPermanently)
 		} else {
-			return `Come along Pond!`
+			http.Redirect(writer, req, "/repositories", http.StatusMovedPermanently)
 		}
 	})
 
@@ -50,11 +50,7 @@ func (c *Server) mapRoutes() {
 		token := req.URL.Query().Get("token")
 		repository, err := FindRepository(id)
 
-		if err != nil {
-			return 404, ""
-		}
-
-		if repository.Token() != token {
+		if err != nil || repository.Token() != token {
 			return 404, ""
 		}
 
@@ -65,8 +61,13 @@ func (c *Server) mapRoutes() {
 	})
 
 	c.Get("/repositories", GitHubLoginRequired, func(r render.Render) {
-		repositories, _ := AllRepositories()
-		r.HTML(200, "repositories/index", repositories)
+		repositories, err := AllRepositories()
+
+		if err != nil {
+			r.HTML(500, "error", err)
+		} else {
+			r.HTML(200, "repositories/index", repositories)
+		}
 	})
 
 	c.Get("/repositories/new", GitHubLoginRequired, func(r render.Render) {
@@ -76,22 +77,31 @@ func (c *Server) mapRoutes() {
 
 	c.Get("/repositories/:id", GitHubLoginRequired, func(r render.Render, params martini.Params, req *http.Request) {
 		id, _ := strconv.ParseInt(params["id"], 0, 0)
-		repository, _ := FindRepository(id)
-		values := struct {
-			Repository *Repository
-			Host       string
-		}{repository, req.Host}
+		repository, err := FindRepository(id)
 
-		r.HTML(200, "repositories/show", values)
+		if err != nil {
+			r.HTML(500, "error", err)
+		} else {
+			values := struct {
+				Repository *Repository
+				Host       string
+			}{repository, req.Host}
+
+			r.HTML(200, "repositories/show", values)
+		}
 	})
 
-	c.Post("/repositories", GitHubLoginRequired, func(req *http.Request, writer http.ResponseWriter) {
+	c.Post("/repositories", GitHubLoginRequired, func(req *http.Request, writer http.ResponseWriter, r render.Render) {
 		origin := req.FormValue("repository[origin]")
 		destination := req.FormValue("repository[destination]")
 		repository := BuildRepository(0, origin, destination, nil)
-		repository.Save()
+		err := repository.Save()
 
-		http.Redirect(writer, req, "/repositories", http.StatusMovedPermanently)
+		if err != nil {
+			r.HTML(500, "error", err)
+		} else {
+			http.Redirect(writer, req, "/repositories", http.StatusMovedPermanently)
+		}
 	})
 }
 
