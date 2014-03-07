@@ -40,13 +40,19 @@ func getPath() string {
 func deploy(message deploy_docus.Message) {
 	fmt.Println("I just received a message:", message)
 
-	err := deploy_docus.NewCloner(message.Repository).Fetch()
+	output, err := deploy_docus.NewCloner(message.Repository).Fetch()
+	if output != nil {
+		fmt.Println(string(output))
+	}
 	if err != nil {
 		fmt.Println("Couldn't clone the repository:", err)
 		return
 	}
 
-	err = deploy_docus.NewPusher(&message).Push()
+	output, err = deploy_docus.NewPusher(&message).Push()
+	if output != nil {
+		fmt.Println(string(output))
+	}
 	if err != nil {
 		fmt.Println("Couldn't push the repository:", err)
 		return

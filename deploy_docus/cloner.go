@@ -23,23 +23,18 @@ func (c *Cloner) BuildCmd() *exec.Cmd {
 	}
 }
 
-func (c *Cloner) Fetch() error {
+func (c *Cloner) Fetch() ([]byte, error) {
 	err := os.RemoveAll(c.LocalPath())
 
-  err = c.Repository.Rsa.WriteKey()
-  if err != nil {
-    return err
-  }
+	err = c.Repository.Rsa.WriteKey()
+	if err != nil {
+		return nil, err
+	}
 
 	command := c.BuildCmd()
 	fmt.Println(command)
-	_, err = command.Output()
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+	output, err := command.Output()
+	return output, err
 }
 
 func NewCloner(repository *Repository) *Cloner {

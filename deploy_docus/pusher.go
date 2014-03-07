@@ -27,22 +27,17 @@ func (p *Pusher) BuildCmd() *exec.Cmd {
 	}
 }
 
-func (p *Pusher) Push() error {
+func (p *Pusher) Push() ([]byte, error) {
 
-  err := p.Message.Repository.Rsa.WriteKey()
-  if err != nil {
-    return err
-  }
+	err := p.Message.Repository.Rsa.WriteKey()
+	if err != nil {
+		return nil, err
+	}
 
 	command := p.BuildCmd()
 	fmt.Println(command)
-	_, err = command.Output()
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+	output, err := command.Output()
+	return output, err
 }
 
 func NewPusher(message *Message) *Pusher {
