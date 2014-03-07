@@ -83,7 +83,6 @@ func BuildRsa(repository *Repository, ssh_key []byte) *Rsa {
 		panic(err)
 	}
 	rsa := &Rsa{repository, key}
-	rsa.WriteKey()
 
 	return rsa
 }

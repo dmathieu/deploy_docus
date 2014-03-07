@@ -28,9 +28,15 @@ func (p *Pusher) BuildCmd() *exec.Cmd {
 }
 
 func (p *Pusher) Push() error {
+
+  err := p.Message.Repository.Rsa.WriteKey()
+  if err != nil {
+    return err
+  }
+
 	command := p.BuildCmd()
 	fmt.Println(command)
-	_, err := command.Output()
+	_, err = command.Output()
 
 	if err != nil {
 		return err

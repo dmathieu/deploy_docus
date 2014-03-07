@@ -26,6 +26,11 @@ func (c *Cloner) BuildCmd() *exec.Cmd {
 func (c *Cloner) Fetch() error {
 	err := os.RemoveAll(c.LocalPath())
 
+  err = c.Repository.Rsa.WriteKey()
+  if err != nil {
+    return err
+  }
+
 	command := c.BuildCmd()
 	fmt.Println(command)
 	_, err = command.Output()
