@@ -46,18 +46,24 @@ func (c *Server) mapRoutes() {
 	})
 
 	c.Post("/deploy/:id", binding.Form(Message{}), func(message Message, channel *chan Message, req *http.Request, params martini.Params) (int, string) {
-		id, _ := strconv.ParseInt(params["id"], 0, 0)
-		token := req.URL.Query().Get("token")
-		repository, err := FindRepository(id)
+		eventType := req.Header.Get("X-GitHub-Event")
 
-		if err != nil || repository.Token() != token {
-			return 404, ""
+		if eventType == "deployment" {
+			id, _ := strconv.ParseInt(params["id"], 0, 0)
+			token := req.URL.Query().Get("token")
+			repository, err := FindRepository(id)
+
+			if err != nil || repository.Token() != token {
+				return 404, ""
+			}
+
+			message.Repository = repository
+			*channel <- message
+
+			return 201, ""
+		} else {
+			return 400, "This webhook endpoint accepts only deployments"
 		}
-
-		message.Repository = repository
-		*channel <- message
-
-		return 201, ""
 	})
 
 	c.Get("/repositories", GitHubLoginRequired, func(r render.Render) {

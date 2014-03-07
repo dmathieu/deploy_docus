@@ -40,6 +40,7 @@ func TestSuccessfulDeploy(t *testing.T) {
 	request, err := http.NewRequest("POST", url, content)
 	assert.Equal(t, nil, err)
 
+	request.Header.Add("X-GitHub-Event", "deployment")
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	request.Header.Add("Content-Length", strconv.Itoa(len(payload.Encode())))
 
@@ -69,6 +70,8 @@ func TestDeployMissingRepository(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+
+	request.Header.Add("X-GitHub-Event", "deployment")
 	server.ServeHTTP(response, request)
 
 	assert.Equal(t, http.StatusNotFound, response.Code)
@@ -88,7 +91,27 @@ func TestDeployInvalidToken(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+
+	request.Header.Add("X-GitHub-Event", "deployment")
 	server.ServeHTTP(response, request)
 
 	assert.Equal(t, http.StatusNotFound, response.Code)
+}
+
+func TestDeployOtherEvent(t *testing.T) {
+	RemoveAllRepositories()
+	server := NewServer(80, nil, ServerPath())
+
+	response := httptest.NewRecorder()
+	response.Body = new(bytes.Buffer)
+
+	request, err := http.NewRequest("POST", "/deploy/42", nil)
+	if err != nil {
+		panic(err)
+	}
+
+	request.Header.Add("X-GitHub-Event", "push")
+	server.ServeHTTP(response, request)
+
+	assert.Equal(t, http.StatusBadRequest, response.Code)
 }
