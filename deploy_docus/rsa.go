@@ -42,7 +42,7 @@ func (r *Rsa) WriteKey() error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(path, key, 0700)
+	err = ioutil.WriteFile(path, key, 0600)
 	return err
 }
 
