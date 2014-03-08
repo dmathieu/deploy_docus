@@ -30,8 +30,8 @@ func (r *Rsa) Encrypt(value []byte) (string, error) {
 	return base64.URLEncoding.EncodeToString(hasher.Sum(nil)), nil
 }
 
-func (r *Rsa) WriteKey() error {
-	path := r.KeyPath()
+func (r *Rsa) WriteKey(rootPath string) error {
+	path := r.KeyPath(rootPath)
 
 	err := os.MkdirAll(filepath.Dir(path), 0700)
 	if err != nil {
@@ -69,8 +69,8 @@ func (r *Rsa) PublicKey() string {
 	return fmt.Sprintf("ssh-rsa %s", encoded)
 }
 
-func (r *Rsa) KeyPath() string {
-	return fmt.Sprintf("/tmp/deploy_docus/keys/%s", r.Repository.Name())
+func (r *Rsa) KeyPath(rootPath string) string {
+	return fmt.Sprintf("%s/deploy_docus/keys/%s", rootPath, r.Repository.Name())
 }
 
 func BuildPrivateKey(content []byte) (*rsa.PrivateKey, error) {

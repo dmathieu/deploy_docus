@@ -37,15 +37,15 @@ func TestCreateKeyFile(t *testing.T) {
 	privateKey, _ := BuildPrivateKey(pemPrivateKey)
 	rsa := &Rsa{repository, privateKey}
 
-	_, err := os.Stat(rsa.KeyPath())
+	_, err := os.Stat(rsa.KeyPath(`/tmp`))
 	assert.Equal(t, true, os.IsNotExist(err))
 
-	rsa.WriteKey()
+	rsa.WriteKey(`/tmp`)
 
-	_, err = os.Stat(rsa.KeyPath())
+	_, err = os.Stat(rsa.KeyPath(`/tmp`))
 	assert.Equal(t, false, os.IsNotExist(err))
 
-	content, err := ioutil.ReadFile(rsa.KeyPath())
+	content, err := ioutil.ReadFile(rsa.KeyPath(`/tmp`))
 	privateKey, _ = BuildPrivateKey(content)
 
 	assert.Equal(t, privateKey, rsa.Private)
@@ -55,10 +55,10 @@ func TestKeyPath(t *testing.T) {
 	repository := BuildTestRepository()
 	rsa := repository.Rsa
 
-	assert.Equal(t, "/tmp/deploy_docus/keys/lyonrb_deploy_docus", rsa.KeyPath())
+	assert.Equal(t, "/tmp/deploy_docus/keys/lyonrb_deploy_docus", rsa.KeyPath(`/tmp`))
 
 	rsa.Repository.Origin = "git@github.com:github/hubot.git"
-	assert.Equal(t, "/tmp/deploy_docus/keys/github_hubot", rsa.KeyPath())
+	assert.Equal(t, "/tmp/deploy_docus/keys/github_hubot", rsa.KeyPath(`/tmp`))
 }
 
 func TestPrivateKey(t *testing.T) {

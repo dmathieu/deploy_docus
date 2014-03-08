@@ -40,7 +40,8 @@ func getPath() string {
 func deploy(message deploy_docus.Message) {
 	fmt.Println("I just received a message:", message)
 
-	output, err := deploy_docus.NewCloner(message.Repository).Fetch()
+	tmpPath := path.Join(getPath(), "tmp")
+	output, err := deploy_docus.NewCloner(message.Repository, tmpPath).Fetch()
 	if output != nil {
 		fmt.Println(string(output))
 	}
@@ -49,7 +50,7 @@ func deploy(message deploy_docus.Message) {
 		return
 	}
 
-	output, err = deploy_docus.NewPusher(&message).Push()
+	output, err = deploy_docus.NewPusher(&message, tmpPath).Push()
 	if output != nil {
 		fmt.Println(string(output))
 	}

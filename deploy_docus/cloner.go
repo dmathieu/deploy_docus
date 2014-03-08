@@ -7,7 +7,8 @@ import (
 )
 
 type Cloner struct {
-	*Repository
+	Repository *Repository
+	Path       string
 }
 
 func (c *Cloner) BuildCmd() *exec.Cmd {
@@ -18,15 +19,15 @@ func (c *Cloner) BuildCmd() *exec.Cmd {
 
 	return &exec.Cmd{
 		Path: path,
-		Args: []string{"git", "clone", c.Origin, c.LocalPath()},
-		Env:  []string{"GIT_SSH=script/ssh", fmt.Sprintf("PKEY=%s", c.Repository.Rsa.KeyPath())},
+		Args: []string{"git", "clone", c.Repository.Origin, c.Repository.LocalPath()},
+		Env:  []string{"GIT_SSH=script/ssh", fmt.Sprintf("PKEY=%s", c.Repository.Rsa.KeyPath(c.Path))},
 	}
 }
 
 func (c *Cloner) Fetch() ([]byte, error) {
-	err := os.RemoveAll(c.LocalPath())
+	err := os.RemoveAll(c.Repository.LocalPath())
 
-	err = c.Repository.Rsa.WriteKey()
+	err = c.Repository.Rsa.WriteKey(c.Path)
 	if err != nil {
 		return nil, err
 	}
@@ -37,6 +38,6 @@ func (c *Cloner) Fetch() ([]byte, error) {
 	return output, err
 }
 
-func NewCloner(repository *Repository) *Cloner {
-	return &Cloner{repository}
+func NewCloner(repository *Repository, path string) *Cloner {
+	return &Cloner{repository, path}
 }
